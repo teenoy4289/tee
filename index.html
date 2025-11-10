@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AD-GENIUS: Creative AI Ads Manager</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>AD-GENIUS</h1>
+        <p>The Ultimate Creative Prompt & Content Generator (Powered by Top-Tier AI)</p>
+    </header>
+
+    <main>
+        <section id="input-dashboard">
+            <h2>✨ 1. Input Dashboard (กรอกข้อมูลครั้งเดียว ใช้ได้ทุกเมนู)</h2>
+            <div class="form-group">
+                <label for="product-name">ชื่อสินค้า:</label>
+                <input type="text" id="product-name" placeholder="เช่น เซรั่มบำรุงผิวสูตรเข้มข้น">
+            </div>
+            <div class="form-group">
+                <label for="product-details">รายละเอียดสินค้า (เน้นประโยชน์):</label>
+                <textarea id="product-details" rows="3" placeholder="เช่น ช่วยลดริ้วรอยภายใน 7 วัน, ผิวชุ่มชื้นยาวนาน 24 ชม., มีส่วนผสมจากทองคำบริสุทธิ์"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="target-audience">กลุ่มเป้าหมาย (ระบุเพศ, อายุ, ปัญหา, ความสนใจ):</label>
+                <input type="text" id="target-audience" placeholder="เช่น ผู้หญิงอายุ 30-45 ปี, มีปัญหาริ้วรอยรอบดวงตา, ชอบแบรนด์หรู">
+            </div>
+            <div class="form-group">
+                <label for="tone">โทนภาพรวม (Mood & Tone):</label>
+                <select id="tone">
+                    <option value="Luxe / Elegant">Luxe / Elegant (หรูหรา)</option>
+                    <option value="Modern / Minimalist">Modern / Minimalist (โมเดิร์น / มินิมอล)</option>
+                    <option value="Enthusiastic / Energetic">Enthusiastic / Energetic (กระตือรือร้น)</option>
+                    <option value="Professional / Trustworthy">Professional / Trustworthy (มืออาชีพ น่าเชื่อถือ)</option>
+                    <option value="Fun / Playful">Fun / Playful (สนุก ขี้เล่น)</option>
+                    <option value="Calm / Serene">Calm / Serene (สงบ นุ่มนวล)</option>
+                </select>
+            </div>
+            
+            <button onclick="generateAllContent()" class="btn-primary">⚡️ สร้างเนื้อหาและ Prompt ทั้งหมด</button>
+            <div id="loading-indicator" style="display:none; color: green; margin-top: 10px;">กำลังประมวลผล...</div>
+        </section>
+        
+        <hr>
+
+        <section id="output-modules">
+            <h2>📄 2. Content & Prompt Generators</h2>
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'sora-prompt')">🎬 Sora 2 Video Prompt (ข้อ 4)</button>
+                <button class="tab-button" onclick="openTab(event, 'fb-caption')">📱 FB/IG Caption (ข้อ 1)</button>
+                <button class="tab-button" onclick="openTab(event, 'tiktok-shopee')">🛍️ TikTok/Shopee (ข้อ 2, 3)</button>
+                <button class="tab-button" onclick="openTab(event, 'voice-review')">🎤 Voice Review Script (ข้อ 6)</button>
+                <button class="tab-button" onclick="openTab(event, 'image-prompt')">🖼️ Image Prompt Generator (ข้อ 5, 10)</button>
+                <button class="tab-button" onclick="openTab(event, 'image-i2p')">Upload & Analyze (ข้อ 8, 10)</button>
+            </div>
+
+            <div id="sora-prompt" class="tab-content active">
+                <h3>🎬 Sora 2 Video Prompt Engine (Same Face Lock)</h3>
+                <div id="sora-input-fields">
+                    <h4>Character ID Engine (สำหรับ Same Face 100%):</h4>
+                    <p id="character-id-display" class="highlight-box">**ยังไม่มี Character ID** - กรุณากดปุ่มสร้างเนื้อหา</p>
+                    
+                    <div class="form-group">
+                        <label for="scene1-goal">เป้าหมาย Scene 1:</label>
+                        <select id="scene1-goal">
+                            <option value="Hook Scene">Hook Scene (ฉากดึงดูดความสนใจ)</option>
+                            <option value="Problem Scene">Problem Scene (ฉากแสดงปัญหา)</option>
+                            </select>
+                    </div>
+                     <div class="form-group">
+                        <label for="scene1-camera">มุมกล้อง Scene 1:</label>
+                        <select id="scene1-camera">
+                            <option value="Close-Up">Close-Up</option>
+                            <option value="Medium Shot">Medium Shot</option>
+                            </select>
+                    </div>
+                </div>
+                <div id="sora-output"></div>
+            </div>
+
+            <div id="fb-caption" class="tab-content">
+                <h3>📱 Facebook/Instagram Long Caption (SEO & Scroll-Stop)</h3>
+                <div id="fb-output"></div>
+            </div>
+
+             <div id="tiktok-shopee" class="tab-content">
+                <h3>🛍️ TikTok & Shopee 5 Styles</h3>
+                <div id="tiktok-output"></div>
+                <div id="shopee-output"></div>
+            </div>
+
+            <div id="voice-review" class="tab-content">
+                <h3>🎤 Voice Review Script (30-50 Sec, ธรรมชาติ)</h3>
+                <div id="voice-output"></div>
+            </div>
+
+            <div id="image-prompt" class="tab-content">
+                <h3>🖼️ Image Prompt Generator (5-9 Styles)</h3>
+                <div id="image-prompt-output"></div>
+            </div>
+            
+            <div id="image-i2p" class="tab-content">
+                <h3>📸 Image-to-Prompt (I2P) Analysis & Prompt Builder</h3>
+                <input type="file" id="image-upload" accept="image/*" multiple onchange="analyzeImageMock(this.files)">
+                <p>💡 **จำลองการทำงาน**: ระบบกำลังวิเคราะห์สีและพื้นผิวของสินค้า เพื่อสร้าง Product ID ที่แม่นยำ</p>
+                <div id="i2p-result" class="highlight-box"></div>
+                <div id="i2p-prompts-output"></div>
+            </div>
+        </section>
+
+        <hr>
+
+        <section id="gallery-export">
+            <h2>💾 3. Gallery & Bulk Export</h2>
+            <button onclick="handleBulkExport()" class="btn-export">📥 Bulk Export: ดาวน์โหลดข้อมูลและรูปภาพทั้งหมด (.zip)</button>
+            <div id="gallery">
+                <p>รูปภาพ AI ที่สร้างขึ้นจะแสดงที่นี่ พร้อมระบบ Favorites และ Lightbox Preview</p>
+            </div>
+            <div id="favorites-section">
+                <h3>⭐ My Favorites</h3>
+                <p>รูปภาพที่คุณกด Star จะถูกบันทึกไว้ที่นี่</p>
+            </div>
+        </section>
+        
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 AD-GENIUS. A project by The World's Top Programmer.</p>
+    </footer>
+
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="close">&times;</span>
+        <div class="lightbox-content">
+            <img id="lightbox-image" src="">
+            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script src="style.css"></script>
+</body>
+</html>
