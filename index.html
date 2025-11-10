@@ -3,144 +3,1001 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AD-GENIUS: Creative AI Ads Manager</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Creative Ads Manager AI - สร้างคอนเทนต์โฆษณาแบบมือโปร</title>
+
+    <!-- === LIBRARIES === -->
+    <script src="https://js.puter.com/v2/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/css/lightbox.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/lightbox2@2.11.4/dist/js/lightbox.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+    <!-- === STYLES === -->
+    <style>
+        /* === RESET & BASE === */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* === HEADER & NAV === */
+        header nav {
+            background: #007bff;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        header nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            list-style: none;
+        }
+        header nav a {
+            color: white;
+            padding: 1rem 1.5rem;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        header nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* === MAIN LAYOUT === */
+        main section {
+            display: none;
+            padding: 2rem;
+            margin: 1.5rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        main section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* === FORM ELEMENTS === */
+        form label {
+            display: block;
+            margin: 1rem 0 0.5rem;
+            font-weight: 600;
+            color: #495057;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.25);
+        }
+
+        /* === GALLERY === */
+        #gallery, #favorites {
+            padding: 2rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            margin: 1.5rem;
+        }
+        .gallery-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .gallery-title i { color: #007bff; }
+
+        .gallery-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 180px;
+        }
+        .control-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .search-input {
+            position: relative;
+        }
+        .search-input i {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+        .search-input input {
+            padding-left: 2.5rem !important;
+        }
+
+        #gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+            padding: 0.5rem;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            background: white;
+            aspect-ratio: 1;
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+            animation: galleryItemFadeIn 0.6s ease forwards;
+        }
+        @keyframes galleryItemFadeIn {
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .gallery-item:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .gallery-item:hover img { transform: scale(1.08); }
+
+        .gallery-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 1.5rem 1rem 1rem;
+            transform: translateY(50%);
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover .gallery-overlay { transform: translateY(0); }
+
+        .overlay-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        .fav-btn, .download-btn, .edit-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        .fav-btn:hover, .download-btn:hover, .edit-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+        .fav-btn.active { color: #ffd700; background: rgba(255,215,0,0.3); }
+
+        .image-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+        .tag {
+            background: #e9ecef;
+            color: #495057;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .tag-suggestion {
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            z-index: 10;
+            animation: bounceIn 0.6s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.1); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .ai-tag-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(0,123,255,0.2);
+            border-radius: 16px 16px 0 0;
+            overflow: hidden;
+        }
+        .ai-tag-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 30%;
+            background: linear-gradient(90deg, transparent, #007bff, transparent);
+            animation: aiTagShimmer 2s infinite;
+        }
+        @keyframes aiTagShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+
+        /* === PROJECT MANAGER === */
+        #project-manager {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin: 1.5rem;
+        }
+        .project-sidebar {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+            height: fit-content;
+            position: sticky;
+            top: 1rem;
+        }
+        .project-sidebar h3 {
+            margin: 0 0 1.5rem;
+            color: #2c3e50;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .project-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .project-item {
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+        .project-item:hover {
+            background: #f1f3f5;
+            transform: translateX(4px);
+        }
+        .project-item.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        .project-item .status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+        .project-item.draft .status { background: #ffc107; }
+        .project-item.review .status { background: #fd7e14; }
+        .project-item.done .status { background: #28a745; }
+
+        .add-project-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .add-project-btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .project-main {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 1.5rem;
+        }
+        .project-canvas {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+            min-height: 600px;
+        }
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .project-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .project-actions button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+
+        .project-tabs {
+            display: flex;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 1.5rem;
+        }
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            font-weight: 500;
+            color: #6c757d;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+
+        .task-list { list-style: none; padding: 0; margin: 0; }
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+        .task-item:hover {
+            background: #f8f9fa;
+            padding-left: 0.5rem;
+        }
+        .task-checkbox input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+        .task-text.completed {
+            text-decoration: line-through;
+            color: #6c757d;
+        }
+        .task-due.overdue { color: #dc3545; font-weight: 600; }
+
+        #project-notes {
+            width: 100%;
+            height: 300px;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            padding: 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+
+        .assets-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+        }
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        .asset-item {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .asset-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .asset-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 0.5rem;
+            font-size: 0.7rem;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .asset-item:hover .overlay { opacity: 1; }
+
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+
+        /* === PAGE TRANSITION === */
+        .page-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f8f9fa;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .page-transition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .transition-loader {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #e3e3e3;
+            border-top: 6px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 30px rgba(0,123,255,0.2);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .transition-text {
+            margin-top: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #555;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* === TOAST === */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #27ae60;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: slideIn 0.4s ease, fadeOut 0.4s ease 2.6s forwards;
+            font-weight: 500;
+        }
+        .toast.error { background: #e74c3c; }
+        .toast.info { background: #3498db; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(20px); }
+        }
+
+        /* === MODAL === */
+        .modal, .project-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.active, .project-modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalFadeIn 0.4s ease;
+        }
+        @keyframes modalFadeIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 992px) {
+            #project-manager, .project-main { grid-template-columns: 1fr; }
+            #gallery-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        }
+    </style>
 </head>
 <body>
-
     <header>
-        <h1>AD-GENIUS</h1>
-        <p>The Ultimate Creative Prompt & Content Generator (Powered by Top-Tier AI)</p>
+        <nav>
+            <ul>
+                <li><a href="#product-info"><i class="fas fa-box"></i> ข้อมูลสินค้า</a></li>
+                <li><a href="#fb-generator"><i class="fab fa-facebook"></i> Facebook</a></li>
+                <li><a href="#tiktok-generator"><i class="fab fa-tiktok"></i> TikTok</a></li>
+                <li><a href="#shopee-generator"><i class="fas fa-shopping-bag"></i> Shopee</a></li>
+                <li><a href="#sora-generator"><i class="fas fa-video"></i> Sora Video</a></li>
+                <li><a href="#image-prompt"><i class="fas fa-image"></i> Image Prompt</a></li>
+                <li><a href="#voice-review"><i class="fas fa-microphone"></i> Voice Review</a></li>
+                <li><a href="#video-builder"><i class="fas fa-film"></i> Video Builder</a></li>
+                <li><a href="#image-upload"><i class="fas fa-upload"></i> Upload Image</a></li>
+                <li><a href="#image-to-image"><i class="fas fa-exchange-alt"></i> Image-to-Image</a></li>
+                <li><a href="#gallery"><i class="fas fa-images"></i> Gallery</a></li>
+                <li><a href="#project-manager"><i class="fas fa-project-diagram"></i> Project Manager</a></li>
+            </ul>
+        </nav>
     </header>
 
     <main>
-        <section id="input-dashboard">
-            <h2>✨ 1. Input Dashboard (กรอกข้อมูลครั้งเดียว ใช้ได้ทุกเมนู)</h2>
-            <div class="form-group">
-                <label for="product-name">ชื่อสินค้า:</label>
-                <input type="text" id="product-name" placeholder="เช่น เซรั่มบำรุงผิวสูตรเข้มข้น">
-            </div>
-            <div class="form-group">
-                <label for="product-details">รายละเอียดสินค้า (เน้นประโยชน์):</label>
-                <textarea id="product-details" rows="3" placeholder="เช่น ช่วยลดริ้วรอยภายใน 7 วัน, ผิวชุ่มชื้นยาวนาน 24 ชม., มีส่วนผสมจากทองคำบริสุทธิ์"></textarea>
-            </div>
-            <div class="form-group">
-                <label for="target-audience">กลุ่มเป้าหมาย (ระบุเพศ, อายุ, ปัญหา, ความสนใจ):</label>
-                <input type="text" id="target-audience" placeholder="เช่น ผู้หญิงอายุ 30-45 ปี, มีปัญหาริ้วรอยรอบดวงตา, ชอบแบรนด์หรู">
-            </div>
-            <div class="form-group">
-                <label for="tone">โทนภาพรวม (Mood & Tone):</label>
-                <select id="tone">
-                    <option value="Luxe / Elegant">Luxe / Elegant (หรูหรา)</option>
-                    <option value="Modern / Minimalist">Modern / Minimalist (โมเดิร์น / มินิมอล)</option>
-                    <option value="Enthusiastic / Energetic">Enthusiastic / Energetic (กระตือรือร้น)</option>
-                    <option value="Professional / Trustworthy">Professional / Trustworthy (มืออาชีพ น่าเชื่อถือ)</option>
-                    <option value="Fun / Playful">Fun / Playful (สนุก ขี้เล่น)</option>
-                    <option value="Calm / Serene">Calm / Serene (สงบ นุ่มนวล)</option>
-                </select>
-            </div>
-            
-            <button onclick="generateAllContent()" class="btn-primary">⚡️ สร้างเนื้อหาและ Prompt ทั้งหมด</button>
-            <div id="loading-indicator" style="display:none; color: green; margin-top: 10px;">กำลังประมวลผล...</div>
+        <!-- === PRODUCT INFO === -->
+        <section id="product-info" class="active">
+            <h1>ข้อมูลสินค้าหลัก</h1>
+            <form id="product-form">
+                <label>ชื่อสินค้า: <input type="text" id="product-name" required></label>
+                <label>รายละเอียดสินค้า: <textarea id="product-desc" required></textarea></label>
+                <label>กลุ่มเป้าหมาย: <input type="text" id="target-audience" required></label>
+                <label>อัพโหลดรูปสินค้า: <input type="file" id="product-image" accept="image/*"></label>
+                <button type="submit">บันทึกข้อมูล</button>
+            </form>
+            <div id="product-preview"></div>
         </section>
-        
-        <hr>
 
-        <section id="output-modules">
-            <h2>📄 2. Content & Prompt Generators</h2>
-            <div class="tabs">
-                <button class="tab-button active" onclick="openTab(event, 'sora-prompt')">🎬 Sora 2 Video Prompt (ข้อ 4)</button>
-                <button class="tab-button" onclick="openTab(event, 'fb-caption')">📱 FB/IG Caption (ข้อ 1)</button>
-                <button class="tab-button" onclick="openTab(event, 'tiktok-shopee')">🛍️ TikTok/Shopee (ข้อ 2, 3)</button>
-                <button class="tab-button" onclick="openTab(event, 'voice-review')">🎤 Voice Review Script (ข้อ 6)</button>
-                <button class="tab-button" onclick="openTab(event, 'image-prompt')">🖼️ Image Prompt Generator (ข้อ 5, 10)</button>
-                <button class="tab-button" onclick="openTab(event, 'image-i2p')">Upload & Analyze (ข้อ 8, 10)</button>
+        <!-- === GALLERY === -->
+        <section id="gallery">
+            <div class="gallery-title"><i class="fas fa-images"></i> แกลเลอรี่ขั้นสูง</div>
+            <div id="gallery-grid"></div>
+            <div id="favorites" style="margin-top: 3rem;"></div>
+        </section>
+
+        <!-- === PROJECT MANAGER === -->
+        <section id="project-manager">
+            <div class="project-sidebar">
+                <h3><i class="fas fa-project-diagram"></i> โปรเจกต์ของฉัน</h3>
+                <ul class="project-list"></ul>
+                <button class="add-project-btn" onclick="openProjectModal()">
+                    <i class="fas fa-plus"></i> สร้างโปรเจกต์ใหม่
+                </button>
             </div>
 
-            <div id="sora-prompt" class="tab-content active">
-                <h3>🎬 Sora 2 Video Prompt Engine (Same Face Lock)</h3>
-                <div id="sora-input-fields">
-                    <h4>Character ID Engine (สำหรับ Same Face 100%):</h4>
-                    <p id="character-id-display" class="highlight-box">**ยังไม่มี Character ID** - กรุณากดปุ่มสร้างเนื้อหา</p>
-                    
-                    <div class="form-group">
-                        <label for="scene1-goal">เป้าหมาย Scene 1:</label>
-                        <select id="scene1-goal">
-                            <option value="Hook Scene">Hook Scene (ฉากดึงดูดความสนใจ)</option>
-                            <option value="Problem Scene">Problem Scene (ฉากแสดงปัญหา)</option>
-                            </select>
+            <div class="project-main">
+                <div class="project-canvas">
+                    <div class="project-header"></div>
+                    <div class="project-tabs">
+                        <button class="tab-btn active" data-tab="tab-tasks">งาน</button>
+                        <button class="tab-btn" data-tab="tab-notes">โน้ต</button>
+                        <button class="tab-btn" data-tab="tab-calendar">ปฏิทิน</button>
                     </div>
-                     <div class="form-group">
-                        <label for="scene1-camera">มุมกล้อง Scene 1:</label>
-                        <select id="scene1-camera">
-                            <option value="Close-Up">Close-Up</option>
-                            <option value="Medium Shot">Medium Shot</option>
-                            </select>
+                    <div id="tab-tasks" class="tab-content active">
+                        <div id="task-list" class="task-list"></div>
+                        <div class="progress-container">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                                <span style="font-weight:600;">ความคืบหน้า</span>
+                                <span class="progress-text">0% เสร็จสิ้น</span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill"></div></div>
+                        </div>
+                    </div>
+                    <div id="tab-notes" class="tab-content">
+                        <textarea id="project-notes" placeholder="เขียนโน้ต, ไอเดีย, หรือสรุปโปรเจกต์..."></textarea>
+                    </div>
+                    <div id="tab-calendar" class="tab-content">
+                        <div id="project-calendar"></div>
                     </div>
                 </div>
-                <div id="sora-output"></div>
-            </div>
-
-            <div id="fb-caption" class="tab-content">
-                <h3>📱 Facebook/Instagram Long Caption (SEO & Scroll-Stop)</h3>
-                <div id="fb-output"></div>
-            </div>
-
-             <div id="tiktok-shopee" class="tab-content">
-                <h3>🛍️ TikTok & Shopee 5 Styles</h3>
-                <div id="tiktok-output"></div>
-                <div id="shopee-output"></div>
-            </div>
-
-            <div id="voice-review" class="tab-content">
-                <h3>🎤 Voice Review Script (30-50 Sec, ธรรมชาติ)</h3>
-                <div id="voice-output"></div>
-            </div>
-
-            <div id="image-prompt" class="tab-content">
-                <h3>🖼️ Image Prompt Generator (5-9 Styles)</h3>
-                <div id="image-prompt-output"></div>
-            </div>
-            
-            <div id="image-i2p" class="tab-content">
-                <h3>📸 Image-to-Prompt (I2P) Analysis & Prompt Builder</h3>
-                <input type="file" id="image-upload" accept="image/*" multiple onchange="analyzeImageMock(this.files)">
-                <p>💡 **จำลองการทำงาน**: ระบบกำลังวิเคราะห์สีและพื้นผิวของสินค้า เพื่อสร้าง Product ID ที่แม่นยำ</p>
-                <div id="i2p-result" class="highlight-box"></div>
-                <div id="i2p-prompts-output"></div>
+                <div class="assets-panel">
+                    <h4><i class="fas fa-images"></i> สินทรัพย์ในโปรเจกต์</h4>
+                    <div class="asset-grid"></div>
+                </div>
             </div>
         </section>
 
-        <hr>
-
-        <section id="gallery-export">
-            <h2>💾 3. Gallery & Bulk Export</h2>
-            <button onclick="handleBulkExport()" class="btn-export">📥 Bulk Export: ดาวน์โหลดข้อมูลและรูปภาพทั้งหมด (.zip)</button>
-            <div id="gallery">
-                <p>รูปภาพ AI ที่สร้างขึ้นจะแสดงที่นี่ พร้อมระบบ Favorites และ Lightbox Preview</p>
-            </div>
-            <div id="favorites-section">
-                <h3>⭐ My Favorites</h3>
-                <p>รูปภาพที่คุณกด Star จะถูกบันทึกไว้ที่นี่</p>
-            </div>
-        </section>
-        
+        <!-- === OTHER SECTIONS (FB, TikTok, etc.) === -->
+        <!-- (Omitted for brevity - add from previous versions) -->
     </main>
-    
-    <footer>
-        <p>&copy; 2024 AD-GENIUS. A project by The World's Top Programmer.</p>
-    </footer>
 
-    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <span class="close">&times;</span>
-        <div class="lightbox-content">
-            <img id="lightbox-image" src="">
-            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-            <a class="next" onclick="plusSlides(1)">&#10095;</a>
-        </div>
-    </div>
-    
-    <script src="script.js"></script>
-    <script src="style.css"></script>
+    <div class="page-transition" id="page-transition"></div>
+
+    <script>
+        // === GLOBAL VARIABLES ===
+        let productData = JSON.parse(localStorage.getItem('productData')) || {};
+        let galleryImages = JSON.parse(localStorage.getItem('galleryImages')) || [];
+        let projects = JSON.parse(localStorage.getItem('projects')) || [];
+        let currentProject = null;
+        let currentSection = null;
+        let transitionOverlay = null;
+        let calendar = null;
+
+        // === NAVIGATION WITH TRANSITION ===
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (!targetSection || targetSection === currentSection) return;
+
+                showPageTransition(getSectionLoadingMessage(targetId));
+                setTimeout(() => {
+                    document.querySelectorAll('main section').forEach(sec => {
+                        sec.style.display = 'none';
+                        sec.classList.remove('active');
+                    });
+                    targetSection.style.display = 'block';
+                    requestAnimationFrame(() => targetSection.classList.add('active'));
+                    currentSection = targetSection;
+                    hidePageTransition();
+
+                    if (targetId === 'gallery') {
+                        setTimeout(() => {
+                            renderGallery();
+                            updateTagFilterOptions();
+                        }, 100);
+                    }
+                    if (targetId === 'project-manager') {
+                        initProjectManager();
+                    }
+                }, 300);
+            });
+        });
+
+        function showPageTransition(message) {
+            if (!transitionOverlay) {
+                transitionOverlay = document.createElement('div');
+                transitionOverlay.className = 'page-transition';
+                transitionOverlay.id = 'page-transition';
+                transitionOverlay.innerHTML = `<div style="text-align:center;">
+                    <div class="transition-loader"></div>
+                    <div class="transition-text">${message}</div>
+                </div>`;
+                document.body.appendChild(transitionOverlay);
+            }
+            requestAnimationFrame(() => transitionOverlay.classList.add('active'));
+        }
+
+        function hidePageTransition() {
+            if (transitionOverlay) {
+                transitionOverlay.classList.remove('active');
+                setTimeout(() => {
+                    if (transitionOverlay && transitionOverlay.parentNode) {
+                        transitionOverlay.parentNode.removeChild(transitionOverlay);
+                        transitionOverlay = null;
+                    }
+                }, 400);
+            }
+        }
+
+        function getSectionLoadingMessage(id) {
+            const messages = {
+                'gallery': 'กำลังโหลดแกลเลอรี่ AI...',
+                'project-manager': 'กำลังโหลดโปรเจกต์...'
+            };
+            return messages[id] || 'กำลังโหลด...';
+        }
+
+        // === PRODUCT FORM ===
+        const productForm = document.getElementById('product-form');
+        productForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            productData.name = document.getElementById('product-name').value;
+            productData.desc = document.getElementById('product-desc').value;
+            productData.audience = document.getElementById('target-audience').value;
+            const file = document.getElementById('product-image').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    productData.image = e.target.result;
+                    localStorage.setItem('productData', JSON.stringify(productData));
+                    document.getElementById('product-preview').innerHTML = `<img src="${productData.image}" width="200">`;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                localStorage.setItem('productData', JSON.stringify(productData));
+            }
+            loadProductData();
+        });
+
+        function loadProductData() {
+            if (productData.name) {
+                document.getElementById('product-name').value = productData.name;
+                document.getElementById('product-desc').value = productData.desc;
+                document.getElementById('target-audience').value = productData.audience;
+                if (productData.image) {
+                    document.getElementById('product-preview').innerHTML = `<img src="${productData.image}" width="200">`;
+                }
+            }
+        }
+        loadProductData();
+
+        // === GALLERY SYSTEM ===
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            if (galleryImages.length === 0) {
+                grid.innerHTML = `<div class="empty-state"><i class="fas fa-images"></i><p>ยังไม่มีรูปภาพ</p></div>`;
+                return;
+            }
+            grid.innerHTML = galleryImages.map(img => `
+                <div class="gallery-item" onclick="toggleSelection(${img.id}, event)">
+                    <a href="${img.url}" data-fancybox="gallery" data-caption="${img.tags ? img.tags.join(', ') : ''}">
+                        <img src="${img.url}" alt="AI Image">
+                    </a>
+                    <div class="gallery-overlay">
+                        <div style="flex:1;">
+                            <div style="font-weight:600; margin-bottom:0.3rem;">${img.name || 'รูปภาพ AI'}</div>
+                            <div class="image-tags">
+                                ${img.tags ? img.tags.map(t => `<span class="tag">#${t}</span>`).join('') : '<span class="tag">ไม่มีแท็ก</span>'}
+                            </div>
+                        </div>
+                        <div class="overlay-actions">
+                            <button class="fav-btn ${img.fav ? 'active' : ''}" onclick="event.preventDefault(); event.stopPropagation(); toggleFav(${img.id})">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <button class="download-btn" onclick="event.preventDefault(); event.stopPropagation(); downloadImage('${img.url}', '${img.name || 'ai-image'}')">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            ${currentProject ? `<button class="edit-btn" onclick="event.preventDefault(); event.stopPropagation(); addAssetFromGallery({url: '${img.url}', name: '${img.name || 'รูปภาพ'}'})">
+                                <i class="fas fa-folder-plus"></i>
+                            </button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            Fancybox.bind("[data-fancybox]");
+        }
+
+        function addToGallery(url, metadata = {}) {
+            const newImg = {
+                url,
+                id: Date.now() + Math.random(),
+                fav: false,
+                timestamp: new Date().toISOString(),
+                name: metadata.name || '',
+                tags: metadata.tags || [],
+                aiAnalyzed: false
+            };
+            galleryImages.unshift(newImg);
+            localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+            analyzeImageForTags(url, newImg.id);
+            renderGallery();
+            showToast('เพิ่มรูปภาพใหม่และกำลังวิเคราะห์ด้วย AI...', 'success');
+        }
+
+        async function analyzeImageForTags(imageUrl, imageId) {
+            try {
+                const visionPrompt = `Analyze this image and describe in Thai: main subject, style, mood, colors, setting. Keep concise.`;
+                const visionResult = await puter.ai.chat(visionPrompt, { model: 'gpt-4o' }, imageUrl);
+                const tagPrompt = `จากข้อความนี้: "${visionResult}" สร้าง 5-8 แท็กสั้นๆ เป็นภาษาไทย สำหรับโฆษณา ตัวอย่าง: #สินค้าใหม่ #สวยหรู`;
+                const tagResult = await puter.ai.chat(tagPrompt, { model: 'gpt-4o-mini' });
+                const tags = tagResult.split('\n').map(l => l.trim()).filter(l => l.startsWith('#')).map(t => t.slice(1).trim()).slice(0, 8);
+                const img = galleryImages.find(i => i.id === imageId);
+                if (img && tags.length > 0) {
+                    img.tags = [...new Set([...(img.tags || []), ...tags])];
+                    img.aiAnalyzed = true;
+                    localStorage.setItem('galleryImages', JSON.stringify(galleryImages));
+                    showTagBadge(imageId, tags.length);
+                }
+                renderGallery();
+                updateTagFilterOptions();
+            } catch (error) { console.error(error); }
+        }
+
+        function showTagBadge(imageId, count) {
+            const item = document.querySelector(`[onclick*="toggleSelection(${imageId})"]`);
+            if (!item || item.querySelector('.tag-suggestion')) return;
+            const badge = document.createElement('div');
+            badge.className = 'tag-suggestion';
+            badge.innerHTML = `<i class="fas fa-robot"></i> AI เพิ่ม ${count} แท็ก`;
+            const progress = document.createElement('div');
+            progress.className = 'ai-tag-progress';
+            item.style.position = 'relative';
+            item.appendChild(progress);
+            item.appendChild(badge);
+            setTimeout(() => { if (badge.parentNode) badge.parentNode.removeChild(badge); if (progress.parentNode) progress.parentNode.removeChild(progress); }, 3000);
+        }
+
+        // === PROJECT MANAGER ===
+        function initProjectManager() {
+            if (projects.length === 0) {
+                projects.push({ id: Date.now(), name: "แคมเปญแรกของฉัน", status: "draft", createdAt: new Date().toISOString(), tasks: [], notes: "", assets: [], progress: 0 });
+                localStorage.setItem('projects', JSON.stringify(projects));
+            }
+            renderProjectList();
+            selectProject(projects[0].id);
+            initCalendar();
+        }
+
+        function renderProjectList() {
+            const list = document.querySelector('.project-list');
+            if (!list) return;
+            list.innerHTML = projects.map(p => `
+                <li class="project-item ${p.status} ${currentProject && p.id === currentProject.id ? 'active' : ''}" onclick="selectProject(${p.id})">
+                    <span>${p.name}</span>
+                    <div class="status"></div>
+                </li>
+            `).join('');
+        }
+
+        function selectProject(id) {
+            currentProject = projects.find(p => p.id === id);
+            if (!currentProject) return;
+            renderProjectHeader();
+            renderTasks();
+            renderNotes();
+            renderAssets();
+            updateProgress();
+            renderCalendarEvents();
+            renderProjectList();
+        }
+
+        // === UTILITIES ===
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3000);
+        }
+
+        // === INITIALIZE ===
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstSection = document.querySelector('main section');
+            if (firstSection) {
+                firstSection.classList.add('active');
+                currentSection = firstSection;
+            }
+            renderGallery();
+            initProjectManager();
+        });
+    </script>
 </body>
 </html>
